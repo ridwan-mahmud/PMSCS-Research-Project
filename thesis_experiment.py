@@ -9,9 +9,7 @@ Original file is located at
 
 pip install pandas numpy scikit-learn xgboost tensorflow keras matplotlib seaborn
 
-# ============================================
-# CELL 1: Upload Your Dataset Files
-# ============================================
+
 from google.colab import files
 
 print("Upload your ENGLISH dataset CSV file:")
@@ -20,24 +18,20 @@ uploaded_en = files.upload()
 print("\nUpload your BANGLA dataset CSV file:")
 uploaded_bn = files.upload()
 
-# Get file names automatically
+
 ENGLISH_FILE = list(uploaded_en.keys())[0]
 BANGLA_FILE = list(uploaded_bn.keys())[0]
 
 print(f"\nEnglish file: {ENGLISH_FILE}")
 print(f"Bangla file: {BANGLA_FILE}")
 
-# ============================================
-# CELL 2: Install Required Libraries
-# ============================================
+
 !pip install xgboost --quiet
 !pip install seaborn --quiet
 
 print("All libraries installed!")
 
-# ============================================
-# CELL 3: Configuration
-# ============================================
+\
 
 # CHANGE THESE TO MATCH YOUR CSV COLUMN NAMES
 TEXT_COLUMN = "headline"     # Column with headline text
@@ -60,9 +54,6 @@ print(df_check2.head(3))
 
 print("\n⚠️ If column names are different, change TEXT_COLUMN and LABEL_COLUMN above!")
 
-# ============================================
-# CELL 4: COMPLETE THESIS EXPERIMENT
-# ============================================
 
 import pandas as pd
 import numpy as np
@@ -112,9 +103,7 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 print("All imports successful!")
 
 
-# ============================================
-# DATA LOADING
-# ============================================
+
 
 def load_and_prepare_data(file_path, language, balance=False):
 
@@ -199,9 +188,7 @@ def preprocess_text(text, language="english"):
     return text
 
 
-# ============================================
-# TF-IDF
-# ============================================
+
 
 def create_tfidf_features(X_train, X_test):
 
@@ -220,9 +207,7 @@ def create_tfidf_features(X_train, X_test):
     return X_train_tfidf, X_test_tfidf, vectorizer
 
 
-# ============================================
-# EVALUATION
-# ============================================
+
 
 def evaluate_model(y_true, y_pred, model_name, language, inference_time):
 
@@ -264,10 +249,6 @@ def evaluate_model(y_true, y_pred, model_name, language, inference_time):
     return result
 
 
-# ============================================
-# VISUALIZATION
-# ============================================
-
 def plot_confusion_matrix(y_true, y_pred, model_name, language):
 
     cm = confusion_matrix(y_true, y_pred)
@@ -308,9 +289,7 @@ def plot_comparison(results_list, language):
     plt.close()
 
 
-# ============================================
-# MODEL TRAINING FUNCTIONS
-# ============================================
+
 
 def train_naive_bayes(X_tr, X_te, y_tr, y_te, lang):
     print(f"\n⏳ Training Naive Bayes ({lang})...")
@@ -430,9 +409,7 @@ def train_xgboost(X_tr, X_te, y_tr, y_te, lang):
     return result, y_pred
 
 
-# ============================================
-# CUSTOM CNN
-# ============================================
+
 
 def build_cnn(vocab_size, max_len, embed_dim=300):
 
@@ -528,9 +505,7 @@ def train_cnn(X_tr, X_te, y_tr, y_te, lang):
     return result, y_pred
 
 
-# ============================================
-# MAIN EXPERIMENT
-# ============================================
+
 
 def run_experiment(file_path, language, balance=False):
 
@@ -546,12 +521,11 @@ def run_experiment(file_path, language, balance=False):
     X_train = np.array([preprocess_text(t, language) for t in X_train_raw])
     X_test = np.array([preprocess_text(t, language) for t in X_test_raw])
 
-    # Save test set for later LLM evaluation
+    
     test_df = pd.DataFrame({'headline': X_test, 'label': y_test})
     test_df.to_csv(f"{RESULTS_DIR}/test_set_{language.lower()}.csv", index=False)
     print(f"  Test set saved: {RESULTS_DIR}/test_set_{language.lower()}.csv")
 
-    # TF-IDF
     print("\n📊 Creating TF-IDF features...")
     X_tr_tfidf, X_te_tfidf, vec = create_tfidf_features(X_train, X_test)
 
@@ -569,7 +543,7 @@ def run_experiment(file_path, language, balance=False):
         results.append(result)
         plot_confusion_matrix(y_test, y_pred, name, language)
 
-    # CNN (uses raw text, not TF-IDF)
+  
     result, y_pred = train_cnn(X_train, X_test, y_train, y_test, language)
     results.append(result)
     plot_confusion_matrix(y_test, y_pred, "Custom CNN", language)
@@ -580,29 +554,23 @@ def run_experiment(file_path, language, balance=False):
     return results, stats
 
 
-print("✅ All functions loaded! Ready to run experiments.")
+print(" All functions loaded! Ready to run experiments.")
 
-# ============================================
-# CELL 5: RUN ENGLISH EXPERIMENT
-# ============================================
+
 
 print("🚀 Starting English Experiment...")
 en_results, en_stats = run_experiment(ENGLISH_FILE, "English", balance=False)
 
-# ============================================
-# CELL 6: RUN BANGLA EXPERIMENT
-# ============================================
+
 
 print("🚀 Starting Bangla Experiment...")
 bn_results, bn_stats = run_experiment(BANGLA_FILE, "Bangla", balance=True)
 
-# ============================================
-# CELL 7: FINAL RESULTS TABLES FOR THESIS
-# ============================================
+
 
 all_results = en_results + bn_results
 
-# ---- English Table ----
+
 print("=" * 85)
 print("  TABLE: Traditional NLP Model Performance — ENGLISH")
 print("=" * 85)
@@ -611,7 +579,6 @@ print(f"|{'-'*27}|{'-'*10}|{'-'*11}|{'-'*8}|{'-'*10}|")
 for r in en_results:
     print(f"| {r['model']:<25} | {r['accuracy']:>7}% | {r['precision_macro']:>8}% | {r['recall_macro']:>5}% | {r['f1_macro']:>7}% |")
 
-# ---- Bangla Table ----
 print(f"\n{'='*85}")
 print("  TABLE: Traditional NLP Model Performance — BANGLA")
 print("=" * 85)
@@ -620,7 +587,6 @@ print(f"|{'-'*27}|{'-'*10}|{'-'*11}|{'-'*8}|{'-'*10}|")
 for r in bn_results:
     print(f"| {r['model']:<25} | {r['accuracy']:>7}% | {r['precision_macro']:>8}% | {r['recall_macro']:>5}% | {r['f1_macro']:>7}% |")
 
-# ---- Cross Language Comparison ----
 print(f"\n{'='*85}")
 print("  TABLE: Cross-Language Comparison (English vs Bangla)")
 print("=" * 85)
@@ -632,7 +598,7 @@ for en_r in en_results:
             drop = round(en_r['f1_macro'] - bn_r['f1_macro'], 2)
             print(f"| {en_r['model']:<25} | {en_r['f1_macro']:>9}% | {bn_r['f1_macro']:>8}% | {drop:>9} |")
 
-# ---- Dataset Statistics ----
+
 print(f"\n{'='*85}")
 print("  TABLE: Dataset Statistics")
 print("=" * 85)
@@ -641,12 +607,12 @@ for label, stats in [("English", en_stats), ("Bangla", bn_stats)]:
     for k, v in stats.items():
         print(f"    {k}: {v}")
 
-# ---- Save Everything ----
+
 results_df = pd.DataFrame(all_results)
 results_df.to_csv(f"{RESULTS_DIR}/final_results.csv", index=False)
 print(f"\n✅ Results saved to: {RESULTS_DIR}/final_results.csv")
 
-# Save stats
+
 stats_df = pd.DataFrame([en_stats, bn_stats])
 stats_df.to_csv(f"{RESULTS_DIR}/dataset_statistics.csv", index=False)
 print(f"✅ Statistics saved to: {RESULTS_DIR}/dataset_statistics.csv")
